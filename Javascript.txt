@@ -1,15 +1,16 @@
 // For button layout logic, think clock, not book. Can't remember why it ended up this way.
 
+// Set counter after each added
 // Figure out sounds.
 
 $(document).ready(function() {
 
-   var seriesCount = 0;
    var sequence = []; // We'll add a random color each turn.
-   var strict = 1; // How many extra chances does the player get?
-   var stopped = false;
+   var strict = false; // How many extra chances does the player get?
+   var presses = 0;
    var readyForPlayer = true;
-   
+   var tries;
+
    var greenUnlit = "rgb(0, 128, 0)";
    var greenLit = "rgb(0, 220, 0)";
    var redUnlit = "rgb(128, 0, 0)";
@@ -24,6 +25,22 @@ $(document).ready(function() {
    var yellowTone = "https://s3.amazonaws.com/freecodecamp/simonSound3.mp3";
    var blueTone = "https://s3.amazonaws.com/freecodecamp/simonSound4.mp3";
 
+   function readyForPlayerFunction() {
+      readyForPlayer = true;
+      $(".greenButton").addClass("greenButtonActive");
+      $(".redButton").addClass("redButtonActive");
+      $(".blueButton").addClass("blueButtonActive");
+      $(".yellowButton").addClass("yellowButtonActive");
+   }
+
+   function notReadyForPlayerFunction() {
+      readyForPlayer = false;
+      $(".greenButton").removeClass("greenButtonActive");
+      $(".redButton").removeClass("redButtonActive");
+      $(".blueButton").removeClass("blueButtonActive");
+      $(".yellowButton").removeClass("yellowButtonActive");
+   }
+
    function getCount(n) { // Makes the counter always two digits.
       if (n <= 9) {
          $("#counterDisplay").text("0" + n);
@@ -34,92 +51,214 @@ $(document).ready(function() {
 
    function addNextColor() { // Filling our current sequence array with words instead of numbers. Superfluous, but pleasant for me.
       var colors = ["green", "red", "blue", "yellow"];
-      var x = Math.floor(Math.random() * 4)
+      var x = Math.floor(Math.random() * 4) // set to 4
       sequence.push(colors[x]);
+      console.log("The sequence of colors is " + sequence)
+      getCount(sequence.length);
+      
    }
 
    function showSequence() { // This does not add the next in sequence so we can play the last sequence back if the player messes up (on non-strict mode) 
       i = 0;
+
       function thisSequence() {
          setTimeout(function() { // Setting the pace for playback.
-            console.log(sequence[i])
             if (sequence[i] == "green") {
-               $("#greenButton").css("background-color", greenLit); // Making a button light up.
+               $(".greenButton").css("background-color", greenLit); // Making a button light up.
                //greenTone.play();
             }
             if (sequence[i] == "red") {
-               $("#redButton").css("background-color", redLit);
+               $(".redButton").css("background-color", redLit);
                //redTone.play();
             }
             if (sequence[i] == "blue") {
-               $("#blueButton").css("background-color", blueLit);
+               $(".blueButton").css("background-color", blueLit);
                //blueTone.play();
             }
             if (sequence[i] == "yellow") {
-               $("#yellowButton").css("background-color", yellowLit)
+               $(".yellowButton").css("background-color", yellowLit)
                   //yellowTone.play();
             }
+
             setTimeout(function() { // Leave the lit color for a bit before resetting original unlit colors.
-               disableAllButtonLights();
-            }, 600) // Duration of lightup.
+                  disableAllButtonLights();
+               }, 600) // Duration of lightup
+
             i++;
             if (i < sequence.length) {
                thisSequence();
             }
             if (i == sequence.length) {
-               readyForPlayer = true;
+               readyForPlayerFunction();
             }
-      }, 300); // Duration of pause before/between lightups.
-      }
-      thisSequence();  
-      
-   function endPlayerTurnCheck() {
-      
-   }
-      
+
+         }, 300); // Duration of pause before/between lightups.
+      } // Close thisSequence
+      thisSequence();
    }
 
    function disableAllButtonLights() {
-      $("#greenButton").css("background-color", greenUnlit);
-      $("#redButton").css("background-color", redUnlit);
-      $("#blueButton").css("background-color", blueUnlit);
-      $("#yellowButton").css("background-color", yellowUnlit);
+      $(".greenButton").css("background-color", greenUnlit);
+      $(".redButton").css("background-color", redUnlit);
+      $(".blueButton").css("background-color", blueUnlit);
+      $(".yellowButton").css("background-color", yellowUnlit);
    }
 
-   $("#greenButton").on("click", function() { // Event listener instead of CSS:active so we can add sounds too.
-      if (readyForPlayer == true) { // Has the toy finished playing the sequence? Only off during sequence playback so we can play around before starting a game.
-         $("#greenButton").css("background-color", greenLit);
+   $(".greenButton").on("click", function() { // Event listener instead of CSS:active so we can add sounds too.
+      if (readyForPlayer == true && sequence.length >= 1) { // Has the toy finished playing the sequence and a game started?
+         if (sequence[presses] != "green") {
+            if (tries == 1) {
+               notReadyForPlayerFunction();
+               //flash everything twice;
+               //game end: "xx" instead of counter?
+               $("#counterDisplay").text("XX");
+               console.log("green, tries = 1, sequence[presses] = " + sequence[presses]);
+               return;
+            }
+            if (tries == 2) {
+               tries--;
+               notReadyForPlayerFunction();
+               console.log("green, tries = 2, sequence[presses] = " + sequence[presses]+ ", presses = " + presses)
+                  //flash everything twice, pause
+                  //showSequence();
+                  //player turn
+               return;
+            }
+         }
+         if (sequence[presses] == "green" && presses < sequence.length-1) {
+            presses++;
+            console.log("presses++")
+         }
+         if (sequence[presses] == "green" && presses == sequence.length-1) {
+            addNextColor();
+            showSequence();
+            presses = 0;
+         }
+         
       }
    })
-   $("#greenButton").mouseup(function() { // No function right now.
-      disableAllButtonLights();
-   })
-   $("#redButton").on("click", function() {
-      if (readyForPlayer == true) {
-         $("#redButton").addClass("redButtonActive");
+
+   $(".redButton").on("click", function() {
+      if (readyForPlayer == true && sequence.length >= 1) { // Has the toy finished playing the sequence and a game started?
+         if (sequence[presses] != "red") {
+            if (tries == 1) {
+               notReadyForPlayerFunction();
+               //flash everything twice;
+               //game end: "xx" instead of counter?
+               $("#counterDisplay").text("XX");
+               console.log("red, tries = 1, sequence[presses] = " + sequence[presses]);
+               return;
+            }
+            if (tries == 2) {
+               tries--;
+               notReadyForPlayerFunction();
+               console.log("red, tries = 2, sequence[presses] = " + sequence[presses]+ ", presses = " + presses)
+                  //flash everything twice, pause
+                  //showSequence();
+                  //player turn
+               return;
+            }
+         }
+         if (sequence[presses] == "red" && presses < sequence.length-1) {
+            presses++;
+            console.log("presses++")
+         }
+         if (sequence[presses] == "red" && presses == sequence.length-1) {
+            addNextColor();
+            showSequence();
+            presses = 0;
+         }
+         
       }
    })
-   $("#blueButton").on("click", function() {
-      if (readyForPlayer == true) {
-         $("#blueButton").addClass("blueButtonActive");
+
+   $(".blueButton").on("click", function() {
+     if (readyForPlayer == true && sequence.length >= 1) { // Has the toy finished playing the sequence and a game started?
+         if (sequence[presses] != "blue") {
+            if (tries == 1) {
+               notReadyForPlayerFunction();
+               //flash everything twice;
+               //game end: "xx" instead of counter?
+               $("#counterDisplay").text("XX");
+               console.log("blue, tries = 1, sequence[presses] = " + sequence[presses]);
+               return;
+            }
+            if (tries == 2) {
+               tries--;
+               notReadyForPlayerFunction();
+               console.log("blue, tries = 2, sequence[presses] = " + sequence[presses]+ ", presses = " + presses)
+                  //flash everything twice, pause
+                  //showSequence();
+                  //player turn
+               return;
+            }
+         }
+         if (sequence[presses] == "blue" && presses < sequence.length-1) {
+            presses++;
+            console.log("presses++")
+         }
+         if (sequence[presses] == "blue" && presses == sequence.length-1) {
+            addNextColor();
+            showSequence();
+            presses = 0;
+         }
+         
       }
    })
-   $("#yellowButton").on("click", function() {
-      if (readyForPlayer == true) {
-         $("#yellowButton").addClass("yellowButtonActive");
+
+   $(".yellowButton").on("click", function() {
+      if (readyForPlayer == true && sequence.length >= 1) { // Has the toy finished playing the sequence and a game started?
+         if (sequence[presses] != "yellow") {
+            if (tries == 1) {
+               notReadyForPlayerFunction();
+               //flash everything twice;
+               //game end: "xx" instead of counter?
+               $("#counterDisplay").text("XX");
+               console.log("yellow, tries = 1, sequence[presses] = " + sequence[presses]);
+               return;
+            }
+            if (tries == 2) {
+               tries--;
+               notReadyForPlayerFunction();
+               console.log("yellow, tries = 2, sequence[presses] = " + sequence[presses]+ ", presses = " + presses)
+                  //flash everything twice, pause
+                  //showSequence();
+                  //player turn
+               return;
+            }
+         }
+         if (sequence[presses] == "yellow" && presses < sequence.length-1) {
+            presses++;
+            console.log("presses++")
+         }
+         if (sequence[presses] == "yellow" && presses == sequence.length-1) {
+            addNextColor();
+            showSequence();
+            presses = 0;
+         }
+         
       }
    })
 
    $("#startButton").on("click", function() {
-      if (seriesCount === 0) {
-         readyForPlayer = false;
-         addNextColor();   
-         seriesCount++;
-         showSequence();
-         getCount(seriesCount);
-      } else {
+      if (sequence.length > 0) {
          console.log("mashing");
       }
+      if (sequence.length === 0) {
+         notReadyForPlayerFunction();
+         addNextColor();
+         showSequence();
+         getCount(sequence.length);
+      }
+      if (strict == true) {
+         tries = 1;
+         console.log("I set tries to 1 because strict was " + strict);
+      }
+      if (strict == false) {
+         tries = 2;
+         console.log("I set tries to 2 because strict was " + strict)
+      }
+      console.log("tries:" + tries + " strict:" + strict);
    })
 
    $("#resetButton").on("click", function() { // Set everything to the default immediately.
@@ -127,23 +266,24 @@ $(document).ready(function() {
       getCount(seriesCount);
       sequence = [];
       disableAllButtonLights();
+      console.log("tries:" + tries + " strict:" + strict)
 
-      $("#greenButton").css("color", "rgb(0, 128, 0)");
-      $("#redButton").css("color", "rgb(128, 0, 0)");
-      $("#blueButton").css("color", "rgb(0, 0, 128)");
-      $("#yellowButton").css("color", "rgb(180, 180, 0)");
    })
 
    $("#strictButton").on("click", function() {
-      if (strict == 1) {
-         strict = 0;
+
+      if (strict == false) {
+         strict = true;
+         console.log(strict);
          $("#strictButton").css("background-color", "red");
          return;
       }
-      if (strict == 0) {
-         strict = 1;
+      if (strict == true) {
+         strict = false;
+         console.log(strict);
          $("#strictButton").css("background-color", "");
       }
+
    })
-   
+
 })
