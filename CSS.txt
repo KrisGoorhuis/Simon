@@ -1,0 +1,157 @@
+body {
+  background-color: grey;
+}
+
+#toyShell {
+  border: solid 1px black;
+  width: 600px;
+  height: 600px;
+  border-radius: 300px;
+  margin: auto;
+  background: black;
+}
+
+#secondCircle {
+  border: solid 1px black;
+  width: 570px;
+  height: 570px;
+  border-radius: 50%;
+  margin: 15px;
+  background-color: grey;
+}
+
+.colorButton {
+  position: absolute;
+}
+
+.greenButton {
+  width: 245px;
+  height: 245px;
+  background-color: rgb(0, 128, 0);
+  border-radius: 100% 0 0 0;
+  border: 20px solid black;
+}
+
+.greenButtonActive {
+   background-color: rgb(0, 220, 0);
+}
+
+.redButton {
+  width: 245px;
+  height: 245px;
+  background-color: rgb(128, 0, 0);
+  margin-left: 285px;
+  border-radius: 0 100% 0 0;
+  border: 20px solid black;
+}
+
+.redButtonActive {
+   background-color: rgb(220, 0, 0);
+}
+
+.blueButton {
+  width: 245px;
+  height: 245px;
+  background-color: rgb(0, 0, 128);
+  margin-left: 285px;
+  margin-top: 285px;
+  border-radius: 0 0 100% 0;
+  border: 20px solid black;
+}
+
+.blueButtonActive {
+   background-color: rgb(0, 0, 255);
+}
+
+.yellowButton {
+  width: 245px;
+  height: 245px;
+  background-color: rgb(180, 180, 0);
+  margin-top: 285px;
+  border-radius: 0 0 0 100%;
+  border: 20px solid black;
+}
+
+.yellowButtonActive {
+   background-color: rgb(255, 255, 0);
+}
+
+#centralCircle {
+  width: 300px;
+  height: 300px;
+  position: absolute;
+  margin: 136px;
+  background-color: black;
+  border-radius: 100%;
+}
+
+#circleBackplate {
+  width: 280px;
+  height: 280px;
+  position: absolute;
+  margin: 10px;
+  background-color: gray;
+  border-radius: 100%;
+}
+
+#faceThings {
+   margin: 40px;
+   text-align: center;
+   
+   font-family: helvetica;
+}
+
+#simon {
+   font-size: 60px;
+}
+
+#counterDisplay {
+   font-size: 50px;
+   background-color: black;
+   color: gray;
+   width: 150px;
+   height: 50px;
+   line-height: 50px;
+   margin: auto;
+}
+
+#smallButtons {
+   width: 100%;
+   margin-top: 14px;
+}
+
+.faceButtonBox {
+   width: 60px; 
+   display: inline-block;
+}
+
+.faceButton {
+   height: 12px;
+   width: 25px;
+}
+
+p {
+   margin: 10px;
+}
+
+.colorButton {
+   
+}
+
+.faceButton {
+	box-shadow: 0px 1px 0px 0px #1c1b18;
+	background-color: #eae0c2;
+	border-radius: 15px;
+	border: 2px solid #333029;
+	cursor: pointer;
+	padding: 10px 16px;
+	text-shadow:0px 1px 0px #ffffff;
+   outline: none;
+}
+
+.faceButton:active {
+	position:relative;
+	top:1px;
+}
+
+

@@ -1,0 +1,49 @@
+<body>
+   <div id="toyShell">
+      <div id="secondCircle">
+
+         <div class="colorButton greenButton" id="greenButton">
+         </div>
+         <div class="colorButton redButton" id="redButton">
+         </div>
+         <div class="colorButton blueButton" id="blueButton">
+         </div>
+         <div class="colorButton yellowButton" id="yellowButton">
+         </div>
+
+         <div id="centralCircle">
+            <div id="circleBackplate">
+               <div id="faceThings">
+                  <div id="simon"><b>Simon</b></div>
+                  <div id="controls">
+                     <div id="counterDisplay">00</div>
+                     
+                     <div id="smallButtons">
+                        <div class="faceButtonBox">                           
+                           <button class="faceButton" id="startButton"></button>
+                           <p>Start</p>
+                        </div>
+                        <div class="faceButtonBox">
+                           <button class="faceButton" id="resetButton"></button>
+                           <p>Reset</p>
+                        </div>
+                        <div class="faceButtonBox">
+                           <button class="faceButton" id="strictButton"></button>
+                           <p>Strict</p>
+                        </div>
+                     </div>
+                     
+                     
+                  </div>
+               
+               </div>
+               
+               
+            </div>
+         </div>
+
+      </div>
+   </div>
+
+
+</body>
