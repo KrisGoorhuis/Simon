@@ -1,6 +1,6 @@
 // For button layout logic, think clock, not book. Can't remember why it ended up this way.
 
-// Set counter after each added
+// test
 // Figure out sounds.
 
 $(document).ready(function() {
