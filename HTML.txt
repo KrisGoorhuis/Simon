@@ -2,13 +2,13 @@
    <div id="toyShell">
       <div id="secondCircle">
 
-         <div class="colorButton greenButton" id="greenButton">
+         <div class="colorButton greenButton greenButtonActive" id="greenButton"> <!--IDs would cause specificity issues - classes added to change background color would be superceded -->
          </div>
-         <div class="colorButton redButton" id="redButton">
+         <div class="colorButton redButton redButtonActive">
          </div>
-         <div class="colorButton blueButton" id="blueButton">
+         <div class="colorButton blueButton blueButtonActive">
          </div>
-         <div class="colorButton yellowButton" id="yellowButton">
+         <div class="colorButton yellowButton yellowButtonActive">
          </div>
 
          <div id="centralCircle">
