@@ -1,29 +1,78 @@
 // For button layout logic, think clock, not book. Can't remember why it ended up this way.
 
-// Figure out sounds.
 
 $(document).ready(function() {
 
-   var seriesCount = 0;
    var sequence = []; // We'll add a random color each turn.
-   var strict = 1; // How many extra chances does the player get?
-   var stopped = false;
+   var strict = false; // How many extra chances does the player get? Is set to numbers when the player hits start.
+   var presses = 0;
    var readyForPlayer = true;
+   var tries;
+
+   var greenTone = new Audio("https://s3.amazonaws.com/freecodecamp/simonSound1.mp3");
+   var redTone = new Audio("https://s3.amazonaws.com/freecodecamp/simonSound2.mp3");
+   var yellowTone = new Audio("https://s3.amazonaws.com/freecodecamp/simonSound3.mp3");
+   var blueTone = new Audio("https://s3.amazonaws.com/freecodecamp/simonSound4.mp3");
+
+   function playGreenTone() { // This lets us start a sound over if someone is quickly pressing a button. Just greenTone.play() won't play again before it finishes.
+      if (greenTone.paused == true) { // "Paused" seems to mean the same as "stopped" in JS. General sort of "it's not actively playing".
+         greenTone.play();
+      } else {
+         greenTone.currentTime = 0; // Sound's playing when we reach here whether first press or second in quick succession. It's like pulling the scrubber to the start in a media player.
+      }
+   }
+   function playRedTone() {
+      if (redTone.paused == true) {
+         redTone.play();
+      } else {
+         redTone.currentTime = 0;
+      }
+   }
+   function playYellowTone() {
+      if (yellowTone.paused == true) {
+         yellowTone.play();
+      } else {
+         yellowTone.currentTime = 0;
+      }
+   }
+   function playBlueTone() {
+      if (blueTone.paused == true) {
+         blueTone.play();
+      } else {
+         blueTone.currentTime = 0;
+      }
+   }
+
+   function readyForPlayerFunction() {
+      readyForPlayer = true;
+      $(".greenButton").addClass("greenButtonActive");
+      $(".redButton").addClass("redButtonActive");
+      $(".blueButton").addClass("blueButtonActive");
+      $(".yellowButton").addClass("yellowButtonActive");
+   }
+
+   function notReadyForPlayerFunction() {
+      readyForPlayer = false;
+      $(".greenButton").removeClass("greenButtonActive");
+      $(".redButton").removeClass("redButtonActive");
+      $(".blueButton").removeClass("blueButtonActive");
+      $(".yellowButton").removeClass("yellowButtonActive");
+   }
+
+   function enableAllButtonLights() {
+      $(".greenButton").addClass("greenButtonLit");
+      $(".redButton").addClass("redButtonLit");
+      $(".blueButton").addClass("blueButtonLit");
+      $(".yellowButton").addClass("yellowButtonLit");
+   }
    
-   var greenUnlit = "rgb(0, 128, 0)";
-   var greenLit = "rgb(0, 220, 0)";
-   var redUnlit = "rgb(128, 0, 0)";
-   var redLit = "rgb(220, 0, 0)";
-   var blueUnlit = "rgb(0, 0, 128)";
-   var blueLit = "rgb(0, 0, 255)";
-   var yellowUnlit = "rgb(180, 180, 0)";
-   var yellowLit = "rgb(255, 255, 0)";
-
-   var greenTone = "https://s3.amazonaws.com/freecodecamp/simonSound1.mp3";
-   var redTone = "https://s3.amazonaws.com/freecodecamp/simonSound2.mp3";
-   var yellowTone = "https://s3.amazonaws.com/freecodecamp/simonSound3.mp3";
-   var blueTone = "https://s3.amazonaws.com/freecodecamp/simonSound4.mp3";
-
+   function disableAllButtonLights() {
+      $(".greenButton").removeClass("greenButtonLit");
+      $(".redButton").removeClass("redButtonLit");
+      $(".blueButton").removeClass("blueButtonLit");
+      $(".yellowButton").removeClass("yellowButtonLit");
+   }
+   
    function getCount(n) { // Makes the counter always two digits.
       if (n <= 9) {
          $("#counterDisplay").text("0" + n);
@@ -34,116 +83,228 @@ $(document).ready(function() {
 
    function addNextColor() { // Filling our current sequence array with words instead of numbers. Superfluous, but pleasant for me.
       var colors = ["green", "red", "blue", "yellow"];
-      var x = Math.floor(Math.random() * 4)
+      var x = Math.floor(Math.random() * 4);
       sequence.push(colors[x]);
+      getCount(sequence.length);
+
    }
 
-   function showSequence() { // This does not add the next in sequence so we can play the last sequence back if the player messes up (on non-strict mode) 
+   function showSequence() { // This does not add the next in sequence so we can play just the last sequence back if the player messes up (on non-strict mode) 
+      notReadyForPlayerFunction();
       i = 0;
+      presses = 0;
+
       function thisSequence() {
          setTimeout(function() { // Setting the pace for playback.
-            console.log(sequence[i])
             if (sequence[i] == "green") {
-               $("#greenButton").css("background-color", greenLit); // Making a button light up.
-               //greenTone.play();
+               $(".greenButton").addClass("greenButtonLit"); // Making a button light up.
+               playGreenTone();
             }
             if (sequence[i] == "red") {
-               $("#redButton").css("background-color", redLit);
-               //redTone.play();
+               $(".redButton").addClass("redButtonLit");
+               playRedTone();
             }
             if (sequence[i] == "blue") {
-               $("#blueButton").css("background-color", blueLit);
-               //blueTone.play();
+               $(".blueButton").addClass("blueButtonLit");
+               playBlueTone();
             }
             if (sequence[i] == "yellow") {
-               $("#yellowButton").css("background-color", yellowLit)
-                  //yellowTone.play();
+               $(".yellowButton").addClass("yellowButtonLit");
+               playYellowTone();
             }
+
             setTimeout(function() { // Leave the lit color for a bit before resetting original unlit colors.
-               disableAllButtonLights();
-            }, 600) // Duration of lightup.
+                  disableAllButtonLights();
+                  if (i == sequence.length) { // The sequence is finished playing. Ready for the player to press things!
+                     readyForPlayerFunction();
+                 }
+               }, 500) // Duration of lightup
+
             i++;
             if (i < sequence.length) {
                thisSequence();
             }
-            if (i == sequence.length) {
-               readyForPlayer = true;
+            
+         }, 700); // Duration of pause before/between lightups.
+      } // Close thisSequence
+      thisSequence();
+   }
+
+   function mistakeMade() {
+      notReadyForPlayerFunction();
+      if (tries == 1) { // Strict or your first try is up. Game over. Hit reset. If you have a second chance, it's checked for at the end of this cascade.
+         $("#counterDisplay").text("XX");
+      }    
+      function firstFlash() { 
+         setTimeout(function() {
+            enableAllButtonLights();
+            pauseBetween(); // Ordering these in reverse would make these function names the nice blue "I recognize this" color and might be best practice, but gosh darn it it works and it's nicer for ME this way.
+         }, 500)
+      }
+      function pauseBetween() {
+         setTimeout(function() {
+            disableAllButtonLights();
+            secondFlash();
+         }, 500)
+      }   
+      function secondFlash() {
+         setTimeout(function() {
+            enableAllButtonLights();
+            finalOff();
+         }, 500)
+      }
+      function finalOff() {
+         setTimeout(function() {
+            disableAllButtonLights();
+            if (tries == 2) {
+               tries--;
+               showSequence();
             }
-      }, 300); // Duration of pause before/between lightups.
-      }
-      thisSequence();  
-      
-   function endPlayerTurnCheck() {
-      
-   }
-      
+         }, 500)
+      }      
+      firstFlash();
    }
 
-   function disableAllButtonLights() {
-      $("#greenButton").css("background-color", greenUnlit);
-      $("#redButton").css("background-color", redUnlit);
-      $("#blueButton").css("background-color", blueUnlit);
-      $("#yellowButton").css("background-color", yellowUnlit);
-   }
+   
 
-   $("#greenButton").on("click", function() { // Event listener instead of CSS:active so we can add sounds too.
-      if (readyForPlayer == true) { // Has the toy finished playing the sequence? Only off during sequence playback so we can play around before starting a game.
-         $("#greenButton").css("background-color", greenLit);
+   $(".greenButton").on("click", function() {
+      if (readyForPlayer == true && sequence.length < 1) { // Toy hasn't started, just letting the player play around on the buttons.
+         playGreenTone();
+      }
+      if (readyForPlayer == true && sequence.length >= 1) { // Has the toy finished playing the sequence and a game started?
+         playGreenTone();
+         if (sequence[presses] != "green") {
+            if (tries == 1) { // Game over.
+               mistakeMade();
+            }
+            if (tries == 2) { // One more try.      
+               mistakeMade(); 
+            }
+         }
+         if (sequence[presses] == "green" && presses == sequence.length - 1) { // Correctly completing the sequence.
+            presses = 0;
+            addNextColor();
+            showSequence();
+            return; // If we don't exit here, presses will be less than sequence.length-1 and the next "if" will trigger too.
+         }
+         if (sequence[presses] == "green" && presses < sequence.length - 1) { // Correct press but not the end of a sequence.
+            presses++;
+         }
       }
    })
-   $("#greenButton").mouseup(function() { // No function right now.
-      disableAllButtonLights();
-   })
-   $("#redButton").on("click", function() {
-      if (readyForPlayer == true) {
-         $("#redButton").addClass("redButtonActive");
+
+   $(".redButton").on("click", function() {
+      if (readyForPlayer == true && sequence.length < 1) {
+         playRedTone();
+      }
+      if (readyForPlayer == true && sequence.length >= 1) {
+         playRedTone();
+         if (sequence[presses] != "red") {
+            if (tries == 1) {
+               mistakeMade();
+            }
+            if (tries == 2) {               
+               mistakeMade();
+            }
+         }
+         if (sequence[presses] == "red" && presses == sequence.length - 1) {
+            presses = 0;
+            addNextColor();
+            showSequence();
+            return;
+         }
+         if (sequence[presses] == "red" && presses < sequence.length - 1) {
+            presses++;
+         }
       }
    })
-   $("#blueButton").on("click", function() {
-      if (readyForPlayer == true) {
-         $("#blueButton").addClass("blueButtonActive");
+
+   $(".blueButton").on("click", function() {
+      if (readyForPlayer == true && sequence.length < 1) {
+         playBlueTone();
+      }
+      if (readyForPlayer == true && sequence.length >= 1) {
+         playBlueTone();
+         if (sequence[presses] != "blue") {
+            if (tries == 1) {
+               mistakeMade();
+            }
+            if (tries == 2) {
+               mistakeMade();
+            }
+         }
+         if (sequence[presses] == "blue" && presses == sequence.length - 1) {
+            presses = 0;
+            addNextColor();
+            showSequence();
+            return;
+         }
+         if (sequence[presses] == "blue" && presses < sequence.length - 1) {
+            presses++;
+         }
       }
    })
-   $("#yellowButton").on("click", function() {
-      if (readyForPlayer == true) {
-         $("#yellowButton").addClass("yellowButtonActive");
+
+   $(".yellowButton").on("click", function() {
+      if (readyForPlayer == true && sequence.length < 1) {
+         playYellowTone();
+      }
+      if (readyForPlayer == true && sequence.length >= 1) {
+         playYellowTone();
+         if (sequence[presses] != "yellow") {
+            if (tries == 1) {
+               mistakeMade();
+            }
+            if (tries == 2) {
+               mistakeMade();
+            }
+         }
+         if (sequence[presses] == "yellow" && presses == sequence.length - 1) {
+            presses = 0;
+            addNextColor();
+            showSequence();
+            return;
+         }
+         if (sequence[presses] == "yellow" && presses < sequence.length - 1) {
+            presses++;
+         }
       }
    })
 
    $("#startButton").on("click", function() {
-      if (seriesCount === 0) {
-         readyForPlayer = false;
-         addNextColor();   
-         seriesCount++;
+      if (sequence.length > 0) {
+      }
+      if (sequence.length === 0) {
+         notReadyForPlayerFunction();
+         addNextColor();
          showSequence();
-         getCount(seriesCount);
-      } else {
-         console.log("mashing");
+         getCount(sequence.length);
+      }
+      if (strict == true) {
+         tries = 1;
+      }
+      if (strict == false) {
+         tries = 2;
       }
    })
 
    $("#resetButton").on("click", function() { // Set everything to the default immediately.
-      seriesCount = 0;
-      getCount(seriesCount);
       sequence = [];
+      getCount(sequence.length);
       disableAllButtonLights();
-
-      $("#greenButton").css("color", "rgb(0, 128, 0)");
-      $("#redButton").css("color", "rgb(128, 0, 0)");
-      $("#blueButton").css("color", "rgb(0, 0, 128)");
-      $("#yellowButton").css("color", "rgb(180, 180, 0)");
+      readyForPlayerFunction();
    })
 
    $("#strictButton").on("click", function() {
-      if (strict == 1) {
-         strict = 0;
+      if (strict == false) {
+         strict = true;
          $("#strictButton").css("background-color", "red");
          return;
       }
-      if (strict == 0) {
-         strict = 1;
+      if (strict == true) {
+         strict = false;
          $("#strictButton").css("background-color", "");
       }
    })
-   
+
 })
