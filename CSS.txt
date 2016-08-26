@@ -1,3 +1,5 @@
+/* Small button designs started with something from http://www.bestcssbuttongenerator.com/ */
+
 body {
   background-color: grey;
 }
@@ -112,8 +114,7 @@ body {
 
 #faceThings {
    margin: 40px;
-   text-align: center;
-   
+   text-align: center; 
    font-family: helvetica;
 }
 
